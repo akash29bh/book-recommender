@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommender System</title>
+    <!-- Latest Bootstrap 4.5 CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1b1b1b 30%, #222831 100%);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+        .navbar {
+            background-color: #00a65a;
+            padding: 15px;
+        }
+        .navbar-brand {
+            color: white;
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+        .nav-link {
+            color: white;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        .nav-link:hover {
+            color: #f0f0f0;
+        }
+        h1 {
+            color: #00a65a;
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-control {
+            padding: 15px;
+            font-size: 1.2rem;
+            background-color: #292929;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .form-control:focus {
+            background-color: #383838;
+            outline: none;
+            box-shadow: none;
+        }
+        .btn-warning {
+            font-size: 1.2rem;
+            padding: 10px 30px;
+            font-weight: bold;
+            border-radius: 25px;
+            background-color: #ffcc00;
+            border: none;
+            color: black;
+        }
+        .btn-warning:hover {
+            background-color: #ffdd44;
+            color: black;
+        }
+        .container {
+            margin-top: 50px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .card {
+            background-color: #383838;
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+        .card-body {
+            text-align: center;
+            padding: 20px;
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .book-title {
+            color: white;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 1.3rem;
+        }
+        .book-author {
+            color: #b3b3b3;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+        .wishlist-btn {
+            margin-top: 10px;
+            background-color: #00a65a;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .wishlist-btn:hover {
+            background-color: #009f50;
+        }
+        .remove-btn {
+            margin-top: 10px;
+            background-color: #ff5733;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .remove-btn:hover {
+            background-color: #ff3d30;
+        }
+        .wishlist-container {
+            margin-top: 50px;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="#">My Book Recommender</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showWishlist()">Wishlist</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Recommend Books</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form action="/recommend_books" method="post">
+                    <input name="user_input" type="text" class="form-control mb-4" placeholder="Enter book name or author" required>
+                    <div class="text-center">
+                        <input type="submit" class="btn btn-lg btn-warning" value="Recommend">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            {% if data %}
+                {% for i in data %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <img class="card-img-top" src="{{ i[2] }}" alt="Book Cover">
+                                <p class="book-title">{{ i[0] }}</p>
+                                <p class="book-author">{{ i[1] }}</p>
+                                <button class="wishlist-btn" onclick="addToWishlist('{{ i[0] }}', '{{ i[1] }}', '{{ i[2] }}')">Add to Wishlist</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="wishlist-container" id="wishlist-container">
+            <h2>Your Wishlist</h2>
+            <div class="row" id="wishlist-content">
+                <!-- Wishlist items will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Bootstrap 4.5 JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || []; // Load wishlist from localStorage if available
+
+        function addToWishlist(title, author, image) {
+            const bookObj = { title, author, image };
+
+            // Check if the book is already in the wishlist
+            if (!wishlist.some(item => item.title === title)) {
+                wishlist.push(bookObj);
+                localStorage.setItem('wishlist', JSON.stringify(wishlist)); // Save to localStorage
+                alert(title + " added to your wishlist!");
+            } else {
+                alert(title + " is already in your wishlist.");
+            }
+        }
+
+        function showWishlist() {
+            document.getElementById('wishlist-container').style.display = 'block';
+            displayWishlist();
+        }
+
+        function displayWishlist() {
+            const wishlistContent = document.getElementById('wishlist-content');
+            wishlistContent.innerHTML = ''; // Clear previous content
+
+            if (wishlist.length === 0) {
+                wishlistContent.innerHTML = '<p>No books in your wishlist.</p>';
+                return;
+            }
+
+            wishlist.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'col-lg-3 col-md-4 col-sm-6 mb-4';
+                card.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <img class="card-img-top" src="${item.image}" alt="Book Cover">
+                            <p class="book-title">${item.title}</p>
+                            <p class="book-author">${item.author}</p>
+                            <button class="remove-btn" onclick="removeFromWishlist(${index})">Remove</button>
+                        </div>
+                    </div>
+                `;
+                wishlistContent.appendChild(card);
+            });
+        }
+
+        function removeFromWishlist(index) {
+            wishlist.splice(index, 1); // Remove the book from the wishlist
+            localStorage.setItem('wishlist', JSON.stringify(wishlist)); // Update localStorage
+            displayWishlist(); // Refresh the displayed wishlist
+            alert("Book removed from your wishlist!");
+        }
+    </script>
+
+</body>
+</html>
